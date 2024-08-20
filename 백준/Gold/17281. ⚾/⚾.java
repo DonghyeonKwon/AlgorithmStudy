@@ -1,115 +1,134 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int n, max = 0;
-	static int[] order = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-	static int[] select;
-	static int[][] map;
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		StringTokenizer st;
-		
-		n = Integer.parseInt(br.readLine());
-		map = new int[n][9];
-		
-		for(int i = 0; i < n; i++) {
-			st = new StringTokenizer(br.readLine());
-			for(int j = 0; j < 9; j++) {
-				map[i][j] = Integer.parseInt(st.nextToken());
-			}
-		}
-		
-		select = new int[9];
-		
-		dfs(0, 0);
-		
-		bw.write(max + "\n");
-		bw.flush();
-		bw.close();
-		br.close();
-	}
-	
-	static void dfs(int ecnt, int idx) {
-		if(ecnt == ((1 << 9) - 1)) {
-			if(select[3] != 0) return;
-			
-			int i = 0, score = 0;
-			for(int j = 0; j < n; j++) {
-				int out = 0;
-				boolean[] base = {false, false, false};
-				while(true) {
-					if(map[j][select[i]] == 0) {
-						out++;
-					} else if(map[j][select[i]] == 1) {
-						if(base[2] == true) {
-							score++;
-							base[2] = false;
-						}
-						base[2] = base[1];
-						base[1] = base[0];
-						base[0] = true;
-					} else if(map[j][select[i]] == 2) {
-						if(base[2]) {
-							score++;
-							base[2] = false;
-						}
-						if(base[1]) {
-							score++;
-							base[1] = false;
-						}
-						base[2] = base[0];
-						base[0] = false;
-						base[1] = true;
-					} else if(map[j][select[i]] == 3) {
-						if(base[2]) {
-							score++;
-							base[2] = false;
-						}
-						if(base[1]) {
-							score++;
-							base[1] = false;
-						}
-						if(base[0]) {
-							score++;
-							base[0] = false;
-						}
-						
-						base[2] = true;
-					} else if(map[j][select[i]] == 4) {
-						int cnt = 0;
-						for(int k = 0; k < 3; k++) {
-							if(base[k]) cnt++;
-							base[k] = false;
-						}
-						score += cnt + 1;
-		
-					}
-					
-					
-					if(i + 1 == 9) i = 0;
-					else i += 1;
-					
-					if(out == 3) {
-						break;
-					}
-				}
-			}
-			max = Math.max(max, score);
-			return;
-		}
-		
-		for(int i = 0; i < 9; i++) {
-			if((ecnt & (1 << i)) == 0) {
-				select[idx] = order[i];
-				dfs(ecnt | (1 << i), idx + 1);
-			}
-		}
-	}
+  static int n;
+  static final int OUTCOUNT = 3;
+  static int[][] arr;
+  static int result;
+  static int[] lineUp;
+  static boolean[] selected = new boolean[9];
+
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    StringTokenizer st;
+
+    n = Integer.parseInt(br.readLine());
+    result = 0;
+
+    arr = new int[n][9];
+    for (int i = 0; i < n; i++) {
+      st = new StringTokenizer(br.readLine(), " ");
+      for (int j = 0; j < 9; j++) {
+        arr[i][j] = Integer.parseInt(st.nextToken());
+      }
+    }
+
+    // 중복 허용 안하고 순열
+    lineUp = new int[9];
+    selected = new boolean[9];
+    lineUp[3] = 0; // 1번 선수는 4번 타자
+    selected[0] = true; // 1번 선수(0번 인덱스)를 선택으로 표시
+    select(0);
+
+    System.out.println(result);
+  }
+
+  // 순열
+  static void select(int idx) {
+    if (idx == 9) {
+      simulate(lineUp);
+      return;
+    }
+
+    if (idx == 3) {
+      select(idx + 1);
+      return;
+    } else {
+      for (int i = 1; i < 9; i++) { // 1번 타자는 이미 배정됐으므로 1번부터 시작
+        if (selected[i])
+          continue;
+        lineUp[idx] = i;
+        selected[i] = true;
+        select(idx + 1);
+        selected[i] = false;
+      }
+    }
+  }
+
+  static void simulate(int[] lineUp) {
+    int score = 0;
+    int startPlayer = 0;
+
+    // n 이닝
+    for (int i = 0; i < n; i++) {
+      int outCount = 0;
+      boolean[] base = new boolean[4];
+
+      while (outCount < OUTCOUNT) {
+        int hitter = arr[i][lineUp[startPlayer]];
+        switch (hitter) {
+          case 0: // 아웃
+            outCount++;
+            break;
+          case 1: // 1루타
+            if (base[3]) {
+              score++;
+              base[3] = false;
+            }
+            if (base[2]) {
+              base[3] = true;
+              base[2] = false;
+            }
+            if (base[1]) {
+              base[2] = true;
+            }
+            base[1] = true;
+            break;
+          case 2: // 2루타
+            if (base[3]) {
+              score++;
+              base[3] = false;
+            }
+            if (base[2]) {
+              score++;
+              base[2] = false;
+            }
+            if (base[1]) {
+              base[3] = true;
+              base[1] = false;
+            }
+            base[2] = true;
+            break;
+          case 3: // 3루타
+            if (base[3]) {
+              score++;
+              base[3] = false;
+            }
+            if (base[2]) {
+              score++;
+              base[2] = false;
+            }
+            if (base[1]) {
+              score++;
+              base[1] = false;
+            }
+            base[3] = true;
+            break;
+          case 4: // 홈런
+            score += base[3] ? 1 : 0;
+            score += base[2] ? 1 : 0;
+            score += base[1] ? 1 : 0;
+            score += 1;
+            base[1] = base[2] = base[3] = false;
+            break;
+        }
+        startPlayer++;
+        if (startPlayer == 9) {
+          startPlayer = 0;
+        }
+      }
+    }
+    result = Math.max(result, score);
+  }
 }
