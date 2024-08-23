@@ -13,19 +13,19 @@ public class Main {
 		int l = Integer.parseInt(br.readLine());
 		int n = Integer.parseInt(br.readLine());
 		
-		boolean[] cake = new boolean[l];
+		boolean[] cake = new boolean[l+1];
 
 		
 		int max = 0, maxIdx = 0, realmax = 0, realIdx = 0;
-		for(int i = 0; i < n; i++) {
+		for(int i = 1; i <= n; i++) { //
 			StringTokenizer st = new StringTokenizer(br.readLine());
-			int s = Integer.parseInt(st.nextToken()) - 1;
-			int e = Integer.parseInt(st.nextToken()) - 1;
+			int s = Integer.parseInt(st.nextToken());
+			int e = Integer.parseInt(st.nextToken());
 			
 			int len = e - s + 1;
 			if(max < len) {
 				max = len;
-				maxIdx = i+1;
+				maxIdx = i;
 			}
 			
 			len = 0;
@@ -37,7 +37,7 @@ public class Main {
 			
 			if(realmax < len) {
 				realmax = len;
-				realIdx = i + 1;
+				realIdx = i;
 			}
 		}
 		bw.write(maxIdx + "\n" + realIdx);
