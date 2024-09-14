@@ -5,8 +5,7 @@ public class Main {
 	static int[] arr;
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//		Scanner sc = new Scanner(System.in);
-		StringBuilder sb = new StringBuilder();
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		
 		int n = Integer.parseInt(br.readLine());
 		arr = new int[n];
@@ -17,21 +16,14 @@ public class Main {
 		
 		Arrays.sort(arr);
 		
-		TreeMap<Integer, Pair> map = new TreeMap<>();
-		
 		int m = Integer.parseInt(br.readLine());
 		st = new StringTokenizer(br.readLine());
 		for(int i = 0; i < m; i++) {
 			int num = Integer.parseInt(st.nextToken());
-			if(map.get(num) == null) {
-				int u = upper(n, num);
-				int l = lower(n, num);
-				map.put(num, new Pair(u-l));
-			}
-			sb.append(map.get(num).cnt).append(' ');
+			bw.write((upper(n, num) - lower(n, num)) + " ");
 		}
-		
-		System.out.println(sb);
+		bw.write('\n');
+		bw.flush();
 	}
 	
 	static int upper(int len, int k) {
