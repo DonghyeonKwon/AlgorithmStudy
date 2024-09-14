@@ -2,15 +2,15 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	static int k, max = 0, arr[];
-	static long n;
+	static long k, n, res, lo = 1, hi, max = 0, arr[];
+	
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		k = Integer.parseInt(st.nextToken());
 		n = Long.parseLong(st.nextToken());
 		
-		arr = new int[k];
+		arr = new long[(int)k];
 		
 		for(int i = 0; i < k; i++) {
 			arr[i] = Integer.parseInt(br.readLine());
@@ -18,16 +18,16 @@ public class Main {
 		}
 		
 		long res = 0;
-		long l = 1, r = (long)max;
+		hi = max;
 		
-		while(l <= r) {
-			long mid = (r + l) / 2;
+		while(lo <= hi) {
+			long mid = (lo + hi) / 2;
 						
 			if(check(mid)) {
-				l = mid + 1;
+				lo = mid + 1;
 				res = mid;
 			} else {
-				r = mid - 1;
+				hi = mid - 1;
 			}
 		}
 		
