@@ -22,68 +22,54 @@ public class Main {
 			st = new StringTokenizer(br.readLine());
 			int s = Integer.parseInt(st.nextToken());
 			int e = Integer.parseInt(st.nextToken());
-			
 			list[s].add(e);
 		}
 		
-		boolean[] visited = new boolean[n+1];
-		int[] distance = new int[n+1];
-		Arrays.fill(distance, Integer.MAX_VALUE);
-		int cnt = 0;
-		int start = -1;
-		int dis = -1;
-		distance[x] = 0;
-		PriorityQueue<Pos> pq = new PriorityQueue<>();
-		pq.offer(new Pos(x, 0));
+		int[] res = bfs();
 		
-		while(!pq.isEmpty()) {
-			Pos pos = pq.poll();
-			start = pos.e;
-			dis = pos.dis;
-			
-			if(visited[start]) continue;
-			
-			visited[start] = true;
-			cnt++;
-			
-			if(cnt == n) break;
-			
-			for(int next : list[start]) {
-				if(visited[next]) continue;
-				if(distance[next] > dis + 1) {
-					distance[next] = dis + 1;
-					pq.add(new Pos(next, distance[next]));
-				}
-			}
-		}
-		
+		int count = 0;
 		StringBuilder sb = new StringBuilder();
 		
 		for(int i = 1; i <= n; i++) {
-			if(distance[i] == k) {
+			if(res[i] == k) {
+				count++;
 				sb.append(i).append('\n');
 			}
 		}
 		
-		String res = sb.toString();
-		if(res.length() == 0) {
+		if(count == 0) {
 			System.out.println(-1);
 		} else {
-			System.out.print(res);
+			System.out.print(sb.toString());
 		}
-		
 	}
 	
-	static class Pos implements Comparable<Pos>{
-		int e;
-		int dis;
-		Pos(int e, int dis){
-			this.e = e;
-			this.dis = dis;
+	static int[] bfs() {
+		int[] distance = new int[n+1];
+		Arrays.fill(distance, Integer.MAX_VALUE);
+		
+		boolean[] visited = new boolean[n+1];
+		visited[x] = true;
+		distance[x] = 0;
+		
+		Queue<int[]> q = new ArrayDeque<>();
+		q.offer(new int[] {x, 0});
+		
+		while(!q.isEmpty()) {
+			int[] pos = q.poll();
+			int here = pos[0];
+			int dis = pos[1];
+			
+			if(distance[here] < dis) continue;
+			
+			for(int next : list[here]) {
+				if(distance[next] > dis + 1) {
+					distance[next] = dis+1;
+					q.offer(new int[] {next, distance[next]});
+				}
+			}
 		}
-		@Override
-		public int compareTo(Pos o) {
-			return Integer.compare(this.dis, o.dis);
-		}
+		
+		return distance;
 	}
 }
