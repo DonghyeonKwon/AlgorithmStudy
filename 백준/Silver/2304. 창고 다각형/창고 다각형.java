@@ -1,12 +1,10 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		
 		int n = Integer.parseInt(br.readLine());
 		Stick[] arr = new Stick[n];
@@ -20,7 +18,8 @@ public class Main {
 		
 		int x = arr[0].x;
 		int y = arr[0].y;
-		int idx = 0, sum = 0;
+		int idx = 0;
+		long sum = 0;
 		
 		for(int i = 1; i < n; i++) {
 			if(y < arr[i].y) {
@@ -45,7 +44,11 @@ public class Main {
 			}
 		}
 		
-		System.out.println(sum);
+		bw.write(String.valueOf(sum));
+		
+		bw.flush();
+		bw.close();
+		br.close();
 	}
 	
 	static class Stick implements Comparable<Stick>{
