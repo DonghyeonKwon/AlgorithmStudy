@@ -25,14 +25,13 @@ public class Main {
 			for(int i = 11; i >= 0; i--) {
 				for(int j = 0; j < 6; j++) {
 					if(!visited[i][j] && map[i][j] != '.') {
-						boolean a = bfs(i, j, map[i][j]);
-						flag |= a;
+						flag |= bfs(i, j, map[i][j]);
 					}
 				}
 			}
 			
 			if(!flag) break;
-			else res++;
+			res++;
 			
 			Queue<Character> q = new ArrayDeque<>();
 			for(int j = 0; j <6; j++) {
