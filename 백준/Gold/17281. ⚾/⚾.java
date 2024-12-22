@@ -1,134 +1,109 @@
-import java.io.*;
-import java.util.*;
+import java.util.Scanner;
 
 public class Main {
-  static int n;
-  static final int OUTCOUNT = 3;
-  static int[][] arr;
-  static int result;
-  static int[] lineUp;
-  static boolean[] selected = new boolean[9];
-
-  public static void main(String[] args) throws Exception {
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    StringTokenizer st;
-
-    n = Integer.parseInt(br.readLine());
-    result = 0;
-
-    arr = new int[n][9];
-    for (int i = 0; i < n; i++) {
-      st = new StringTokenizer(br.readLine(), " ");
-      for (int j = 0; j < 9; j++) {
-        arr[i][j] = Integer.parseInt(st.nextToken());
-      }
-    }
-
-    // 중복 허용 안하고 순열
-    lineUp = new int[9];
-    selected = new boolean[9];
-    lineUp[3] = 0; // 1번 선수는 4번 타자
-    selected[0] = true; // 1번 선수(0번 인덱스)를 선택으로 표시
-    select(0);
-
-    System.out.println(result);
-  }
-
-  // 순열
-  static void select(int idx) {
-    if (idx == 9) {
-      simulate(lineUp);
-      return;
-    }
-
-    if (idx == 3) {
-      select(idx + 1);
-      return;
-    } else {
-      for (int i = 1; i < 9; i++) { // 1번 타자는 이미 배정됐으므로 1번부터 시작
-        if (selected[i])
-          continue;
-        lineUp[idx] = i;
-        selected[i] = true;
-        select(idx + 1);
-        selected[i] = false;
-      }
-    }
-  }
-
-  static void simulate(int[] lineUp) {
-    int score = 0;
-    int startPlayer = 0;
-
-    // n 이닝
-    for (int i = 0; i < n; i++) {
-      int outCount = 0;
-      boolean[] base = new boolean[4];
-
-      while (outCount < OUTCOUNT) {
-        int hitter = arr[i][lineUp[startPlayer]];
-        switch (hitter) {
-          case 0: // 아웃
-            outCount++;
-            break;
-          case 1: // 1루타
-            if (base[3]) {
-              score++;
-              base[3] = false;
-            }
-            if (base[2]) {
-              base[3] = true;
-              base[2] = false;
-            }
-            if (base[1]) {
-              base[2] = true;
-            }
-            base[1] = true;
-            break;
-          case 2: // 2루타
-            if (base[3]) {
-              score++;
-              base[3] = false;
-            }
-            if (base[2]) {
-              score++;
-              base[2] = false;
-            }
-            if (base[1]) {
-              base[3] = true;
-              base[1] = false;
-            }
-            base[2] = true;
-            break;
-          case 3: // 3루타
-            if (base[3]) {
-              score++;
-              base[3] = false;
-            }
-            if (base[2]) {
-              score++;
-              base[2] = false;
-            }
-            if (base[1]) {
-              score++;
-              base[1] = false;
-            }
-            base[3] = true;
-            break;
-          case 4: // 홈런
-            score += base[3] ? 1 : 0;
-            score += base[2] ? 1 : 0;
-            score += base[1] ? 1 : 0;
-            score += 1;
-            base[1] = base[2] = base[3] = false;
-            break;
-        }
-        startPlayer++;
-        if (startPlayer == 9) {
-          startPlayer = 0;
-        }
-      }
-    }
-    result = Math.max(result, score);
-  }
+	static int n, res = 0;
+	static int[][] input;
+	static int[] order = new int[10];
+	static boolean[] visited = new boolean[10];
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		
+		n = sc.nextInt();
+		input = new int[n][10];
+		for(int i = 0; i < n; i++) {
+			for(int j = 1; j <= 9; j++) {
+				input[i][j] = sc.nextInt();
+			}
+		}
+		
+		order[4] = 1;
+		visited[1] = true;
+		combi(1);
+		
+		System.out.println(res);
+	}
+	
+	static void combi(int cnt) {
+		if(cnt == 10) {
+			game();
+			return;
+		}
+		
+		if(cnt == 4) {
+			combi(cnt+1);
+			return;
+		}
+		
+		for(int i = 1; i <= 9; i++) {
+			if(visited[i]) continue;
+			order[cnt] = i;
+			visited[i] = true;
+			combi(cnt+1);
+			visited[i] = false;
+		}
+	}
+	
+	static void game() {
+		int score = 0;
+		int idx = 1;
+		for(int i = 0; i < n; i++) {
+			boolean[] base = new boolean[4];
+			int out = 0;
+			
+			while(out < 3) {
+				int k = order[idx];
+				if(input[i][k] == 0) {
+					out++;
+				} else if(input[i][k] == 1) {
+					for(int j = 3; j > 0; j--) {
+						if(base[j]) {
+							if(j+1 >= 4) {
+								score++;
+								base[j] = false;
+							} else {
+								base[j+1] = true;
+								base[j] = false;
+							}
+						}
+					}
+					base[1] = true;
+				} else if(input[i][k] == 2) {
+					for(int j = 3; j > 0; j--) {
+						if(base[j]) {
+							if(j+2 >= 4) {
+								score++;
+								base[j] = false;
+							} else {
+								base[j+2] = true;
+								base[j] = false;
+							}
+						}
+					}
+					base[2] = true;
+				} else if(input[i][k] == 3) {
+					for(int j = 1; j <= 3; j++) {
+						if(base[j]) {
+							score++;
+							base[j] = false;
+						}
+					}
+					base[3] = true;
+				} else if(input[i][k] == 4) {
+					for(int j = 1; j <= 3; j++) {
+						if(base[j]) {
+							score++;
+							base[j] = false;
+						}
+					}
+					score++;
+				}
+				
+				idx++;
+				if(idx == 10) idx = 1;
+			}
+		}
+		
+		res = Math.max(res, score);
+	}
 }
