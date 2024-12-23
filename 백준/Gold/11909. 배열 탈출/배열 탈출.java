@@ -1,6 +1,5 @@
-import java.util.Arrays;
-import java.util.PriorityQueue;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 	static int n;
@@ -9,15 +8,17 @@ public class Main {
 	static int[] dy = {1, 0};
 	static int[] dx = {0, 1};
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
 		
-		n = sc.nextInt();
+		n = Integer.parseInt(br.readLine());
 		map = new int[n+1][n+1];
 		
 		for(int i = 1; i <= n; i++) {
+			st = new StringTokenizer(br.readLine());
 			for(int j = 1; j <= n; j++) {
-				map[i][j] = sc.nextInt();
+				map[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
 		
