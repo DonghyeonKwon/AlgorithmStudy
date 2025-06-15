@@ -9,6 +9,7 @@ public class Main {
 
     static int[][] map;
     static boolean[][] visited;
+    static Queue<int[]> ice = new ArrayDeque<>();
     static Queue<int[]> melted = new ArrayDeque<>();
 
     public static void main(String[] args) throws Exception {
@@ -24,19 +25,20 @@ public class Main {
             st = new StringTokenizer(br.readLine());
             for(int j = 0; j < m; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
+                if(map[i][j] > 0) ice.offer(new int[]{i, j});
             }
         }
 
         int time = 0;
         while(true) {
-            visited = new boolean[n][m];
+            while(!ice.isEmpty()){
+                int[] pos = ice.poll();
 
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (visited[i][j]) continue;
-                    if (map[i][j] != 0) continue;
+                for(int d = 0; d < 4; d++) {
+                    int ny = pos[0] + dy[d];
+                    int nx = pos[1] + dx[d];
 
-                    zero_bfs(i, j);
+                    if(map[ny][nx] == 0) melted.offer(new int[]{pos[0], pos[1]});
                 }
             }
 
@@ -52,6 +54,7 @@ public class Main {
 
             time++;
 
+            visited = new boolean[n][m];
             int cnt = 0;
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < m; j++) {
@@ -62,7 +65,7 @@ public class Main {
                     cnt++;
                 }
             }
-            
+
             if(cnt > 1) break;
 
             if(cnt == 0) {
@@ -78,34 +81,6 @@ public class Main {
         br.close();
     }
 
-    static void zero_bfs(int y, int x) {
-        Queue<int[]> q = new ArrayDeque<>();
-        q.offer(new int[]{y, x});
-        visited[y][x] = true;
-
-        while(!q.isEmpty()){
-            int[] pos = q.poll();
-            y = pos[0];
-            x = pos[1];
-
-            for(int d = 0; d < 4; d++) {
-                int ny = y + dy[d];
-                int nx = x + dx[d];
-
-                if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
-                if(visited[ny][nx]) continue;
-
-                if(map[ny][nx] > 0) {
-                    melted.offer(new int[]{ny, nx});
-                    continue;
-                }
-
-                visited[ny][nx] = true;
-                q.offer(new int[]{ny, nx});
-            }
-        }
-    }
-
     static void count_bfs(int y, int x){
         Queue<int[]> q = new ArrayDeque<>();
         q.offer(new int[]{y, x});
@@ -115,6 +90,8 @@ public class Main {
             int[] pos = q.poll();
             y = pos[0];
             x = pos[1];
+
+            ice.offer(new int[]{y, x});
 
             for(int d = 0; d < 4; d++) {
                 int ny = y + dy[d];
