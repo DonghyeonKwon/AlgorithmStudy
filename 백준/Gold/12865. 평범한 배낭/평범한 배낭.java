@@ -1,31 +1,36 @@
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class Main {
-	static int n, k;
 
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt();
-		k = sc.nextInt();
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-		int bag[][] = new int[n + 1][k + 1];
-		int w[] = new int[n + 1];
-		int v[] = new int[n + 1];
-		for (int i = 1; i <= n; i++) {
-			w[i] = sc.nextInt();
-			v[i] = sc.nextInt();
-		}
+        int n, k;
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        k = Integer.parseInt(st.nextToken());
 
-		for (int j = 0; j <= k; j++) { // 각 무게 마다 가치를 계산
-			for (int i = 1; i <= n; i++) {
-				if (j - w[i] < 0) {
-					bag[i][j] = bag[i-1][j];
-					continue; // 해당 j에서 w[i]값을 뺀 값이 음수이면 continue
-				}
-				bag[i][j] = Math.max(bag[i - 1][j - w[i]] + v[i], bag[i - 1][j]);
-			}
-		}	
+        int[][] dp = new int[n+1][k+1];
+        int[] w = new int[n+1];
+        int[] v = new int[n+1];
 
-		System.out.println(bag[n][k]);
-	}
+        for(int i = 1; i <= n; i++) {
+            st = new StringTokenizer(br.readLine());
+            w[i] = Integer.parseInt(st.nextToken());
+            v[i] = Integer.parseInt(st.nextToken());
+        }
+
+        for(int i = 1; i <= n; i++) {
+            for(int j = 1; j <= k; j++) {
+                if(j < w[i]) dp[i][j] = dp[i-1][j];
+                else {
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i-1][j - w[i]] + v[i]);
+                }
+            }
+        }
+
+        System.out.print(dp[n][k]);
+
+    }
 }
