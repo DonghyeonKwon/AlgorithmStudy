@@ -10,21 +10,21 @@ public class Main {
         int m = Integer.parseInt(br.readLine());
         char[] arr = br.readLine().toCharArray();
 
+        int ans = 0;
         int cnt = 0;
-        for(int i = 0; i <= m - (2 * n + 1); i++) {
-            if(arr[i] == 'I') {
-                boolean flag = true;
-                for(int j = 0; j < 2 * n + 1; j++) {
-                    if(j % 2 == 0 && arr[i + j] == 'I') continue;
-                    if(j % 2 == 1 && arr[i + j] == 'O') continue;
-                    flag = false;
-                    break;
+        for(int i = 0; i < m - 2; i++) {
+            if(arr[i] == 'I' && arr[i+1] == 'O' && arr[i+2] == 'I') {
+                cnt++;
+                i++;
+                if(cnt == n) {
+                    cnt--;
+                    ans++;
                 }
-
-                if(flag) cnt++;
+            } else {
+                cnt = 0;
             }
         }
 
-        System.out.print(cnt);
+        System.out.print(ans);
     }
 }
