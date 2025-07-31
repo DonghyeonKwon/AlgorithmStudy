@@ -24,59 +24,47 @@ public class Main {
     }
 
     static String bfs(int num, int dest) {
-        Queue<Node> q = new ArrayDeque<>();
+        Queue<Integer> q = new ArrayDeque<>();
         boolean[] visited = new boolean[10000];
-        String answer = null;
-        q.add(new Node(num, ""));
+        String[] answer = new String[10000];
+        q.add(num);
+        answer[num] = "";
         visited[num] = true;
         char[] arr = {'D', 'S', 'L', 'R'};
 
-        while(!q.isEmpty()) {
-            Node now = q.poll();
+        while(!q.isEmpty() && !visited[dest]) {
+            int now = q.poll();
 
-            if(now.num == dest) {
-                answer = now.method;
+            int D = (now * 2) % 10000;
+            int S = now== 0 ? 9999 : now - 1;
+            int L = (now % 1000) * 10 + now / 1000;
+            int R = (now / 10) + (now % 10) * 1000;
+
+            if(!visited[D]) {
+                q.add(D);
+                visited[D] = true;
+                answer[D] = answer[now] + 'D';
             }
 
-            for(char c : arr) {
-                if(c == 'D') {
-                    int next = (now.num * 2) % 10000;
-                    if(visited[next]) continue;
+            if(!visited[S]) {
+                q.add(S);
+                visited[S] = true;
+                answer[S] = answer[now] + 'S';
+            }
 
-                    visited[next] = true;
-                    q.add(new Node(next, now.method + c));
-                } else if(c == 'S') {
-                    int next = now.num == 0 ? 9999 : now.num - 1;
-                    if(visited[next]) continue;
+            if(!visited[L]) {
+                q.add(L);
+                visited[L] = true;
+                answer[L] = answer[now] + 'L';
+            }
 
-                    visited[next] = true;
-                    q.add(new Node(next, now.method + c));
-                } else if(c == 'L') {
-                    int next =  (now.num % 1000) * 10 + now.num / 1000;
-                    if(visited[next]) continue;
-
-                    visited[next] = true;
-                    q.add(new Node(next, now.method + c));
-                } else if(c == 'R') {
-                    int next =  (now.num / 10) + (now.num % 10) * 1000;
-                    if(visited[next]) continue;
-
-                    visited[next] = true;
-                    q.add(new Node(next, now.method + c));
-                }
+            if(!visited[R]) {
+                q.add(R);
+                visited[R] = true;
+                answer[R] = answer[now] + 'R';
             }
         }
 
-        return answer + '\n';
-    }
-
-    static class Node {
-        int num;
-        String method;
-
-        Node (int num, String method) {
-            this.num = num;
-            this.method = method;
-        }
+        return answer[dest] + '\n';
     }
 }
