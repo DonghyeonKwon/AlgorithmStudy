@@ -11,6 +11,7 @@ public class Main {
         int k = Integer.parseInt(st.nextToken());
 
         Country[] arr = new Country[n];
+        Country target = null;
         for(int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
 
@@ -20,23 +21,20 @@ public class Main {
             int c = Integer.parseInt(st.nextToken());
 
             arr[i] = new Country(num, a, b, c);
+
+            if(num == k) {
+                target = arr[i];
+            }
         }
 
         Arrays.sort(arr);
 
-        if(arr[0].num == k) {
-            System.out.print(1);
-            return;
-        }
-
         int count = 0;
-        Country prev = arr[0];
-        for(int i = 1; i < n; i++) {
-            if(k == arr[i].num) {
+        for(int i = 0; i < n; i++) {
+            if(target.a == arr[i].a && target.b == arr[i].b && target.c == arr[i].c) {
                 System.out.print(count + 1);
                 break;
-            }
-            if(prev.a != arr[i].a || prev.b != arr[i].b || prev.c != arr[i].c) {
+            } else {
                 count++;
             }
         }
