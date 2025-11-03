@@ -8,7 +8,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        long[][][] dp = new long[n+1][11][1 << 10];
+        long[][][] dp = new long[n+1][10][1 << 10];
         for(int i = 1; i < 10; i++) {
             dp[1][i][1 << i] = 1;
         }
