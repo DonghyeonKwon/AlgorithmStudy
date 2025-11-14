@@ -2,9 +2,10 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, m;
-    static List<Integer>[] list;
-    static Map<Integer, Map<Integer, Integer>> map = new HashMap<>();
+    static int max = -1;
+    static int n, m, start, end;
+    static boolean[] visited;
+    static List<Info>[] list;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -20,73 +21,57 @@ public class Main {
 
         for(int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
+            int start = Integer.parseInt(st.nextToken());
+            int end = Integer.parseInt(st.nextToken());
+            int cost = Integer.parseInt(st.nextToken());
 
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            if(map.containsKey(u) && map.get(u).containsKey(v)) {
-                map.get(u).put(v, Math.max(map.get(u).get(v), c));
-                map.get(v).put(u, Math.max(map.get(v).get(u), c));
-            } else {
-                list[u].add(v);
-                list[v].add(u);
-
-                if(!map.containsKey(u)) {
-                    map.put(u, new HashMap<>());
-                }
-                if(!map.containsKey(v)) {
-                    map.put(v, new HashMap<>());
-                }
-
-                map.get(u).put(v, c);
-                map.get(v).put(u, c);
-            }
+            list[start].add(new Info(end, cost));
+            list[end].add(new Info(start, cost));
         }
 
         st = new StringTokenizer(br.readLine());
-        int start = Integer.parseInt(st.nextToken());
-        int end = Integer.parseInt(st.nextToken());
+        start = Integer.parseInt(st.nextToken());
+        end = Integer.parseInt(st.nextToken());
 
-        int ans = search(start, end);
-        System.out.print(ans);
-    }
 
-    static int search(int start, int end) {
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        boolean[] visited = new boolean[n+1];
-        pq.add(new Edge(start, Integer.MAX_VALUE));
+        int left = 0, right = 1_000_000_000;
+        while(left <= right) {
+            int mid = (left + right) / 2;
 
-        while(!pq.isEmpty()) {
-            Edge now = pq.poll();
-            if(now.v == end) {
-                return now.c;
-            }
-
-            if(visited[now.v]) continue;
-            visited[now.v] = true;
-
-            for(Integer next : list[now.v]) {
-                if(!visited[next]) {
-                    pq.add(new Edge(next, Math.min(now.c, map.get(now.v).get(next))));
-                }
+            visited = new boolean[n+1];
+            max = -1;
+            dfs(start, end, mid);
+            if(max != -1) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
             }
         }
 
-        return 0;
+        System.out.print(right);
     }
 
-    static class Edge implements Comparable<Edge> {
-        int v, c;
-
-        Edge(int v, int c) {
-            this.v = v;
-            this.c = c;
+    static void dfs(int now, int end, int limit) {
+        if(now == end) {
+            max = Math.max(limit, max);
+            return;
         }
 
-        @Override
-        public int compareTo(Edge o) {
-            return o.c - this.c;
+        visited[now] = true;
+
+        for(Info next : list[now]) {
+            if(!visited[next.city] && limit <= next.cost) {
+                dfs(next.city, end, limit);
+            }
+        }
+    }
+
+    static class Info {
+        int city, cost;
+
+        Info(int city, int cost) {
+            this.city = city;
+            this.cost = cost;
         }
     }
 }
