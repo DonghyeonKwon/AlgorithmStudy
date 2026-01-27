@@ -2,9 +2,10 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, m;
-    static Map<Integer, Integer> parent = new HashMap<>();
+    static int n, m, vid = 0;
     static char[][] map;
+    static boolean[][] visited;
+    static int[][] seen;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -13,63 +14,55 @@ public class Main {
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
         map = new char[n][m];
+        seen =  new int[n][m];
+        visited = new boolean[n][m];
 
         for(int i = 0; i < n; i++) {
             map[i] = br.readLine().toCharArray();
         }
-        init();
 
+        int cnt = 0;
         for(int i = 0; i < n; i++) {
             for(int j = 0; j < m; j++) {
-                int ny = i;
-                int nx = j;
-                if(map[i][j] == 'D') {
-                    ny += 1;
-                } else if(map[i][j] == 'L') {
-                    nx -= 1;
-                } else if(map[i][j] == 'U') {
-                    ny -= 1;
-                } else if(map[i][j] == 'R') {
-                    nx += 1;
+                if(!visited[i][j]) {
+                    vid++;
+                    if(bfs(i, j)) cnt++;
                 }
-
-                union(i * 10000 + j, ny * 10000 + nx);
             }
         }
 
-        Set<Integer> set = new HashSet<>();
-        for(int i : parent.keySet()) {
-            int p = find(i);
-            set.add(p);
-        }
-
-        System.out.print(set.size());
+        System.out.print(cnt);
     }
 
-    static void init() {
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
-                int p = i * 10000 + j;
-                parent.put(p, p);
+    static boolean bfs(int y, int x) {
+        Queue<int[]> q = new ArrayDeque<>();
+        q.add(new int[]{y, x});
+        visited[y][x] = true;
+        seen[y][x] = vid;
+
+        while(!q.isEmpty()) {
+            int[] pos = q.poll();
+
+            int ny = pos[0];
+            int nx = pos[1];
+            if(map[ny][nx] == 'D') {
+                ny += 1;
+            } else if(map[ny][nx] == 'R') {
+                nx += 1;
+            } else if(map[ny][nx] == 'L') {
+                nx -= 1;
+            } else if(map[ny][nx] == 'U') {
+                ny -= 1;
             }
+
+            if(seen[ny][nx] == vid) break;
+            if(visited[ny][nx]) return false;
+
+            visited[ny][nx] = true;
+            seen[ny][nx] = vid;
+            q.add(new int[]{ny, nx});
         }
-    }
 
-    static int find(int x) {
-        if(x == parent.get(x)) return x;
-        return parent.get(find(parent.get(x)));
-    }
-
-    static void union(int a, int b) {
-        int aa = find(a);
-        int bb = find(b);
-
-        if(aa == bb) return;
-
-        if(aa > bb) {
-            parent.put(aa, bb);
-        } else {
-            parent.put(bb, aa);
-        }
+        return true;
     }
 }
