@@ -35,9 +35,7 @@ public class Main {
     }
 
     static int bfs(int a, int b) {
-        PriorityQueue<int[]> q = new PriorityQueue<>(
-                (o, p) -> o[1] - p[1]
-        );
+        Queue<int[]> q = new ArrayDeque<>();
         q.add(new int[]{a, 0});
         visited[a] = true;
 
