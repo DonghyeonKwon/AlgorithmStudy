@@ -5,9 +5,11 @@ public class Main {
     static int n, idx = 0;
     static int[] preorder;
     static int[] inorder;
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
 
         int t = Integer.parseInt(br.readLine());
         while(t-->0) {
@@ -35,13 +37,14 @@ public class Main {
             }
 
             tree.postorder();
-            System.out.println();
+            sb.append('\n');
         }
+        System.out.print(sb);
     }
 
     static Node find(int start, int end) {
         if(start > end) return null;
-        
+
         Node node = new Node(preorder[idx]);
 
         for(int i = start; i <= end; i++) {
@@ -68,7 +71,7 @@ public class Main {
         public void postorder() {
             if(this.left != null) this.left.postorder();
             if(this.right != null) this.right.postorder();
-            System.out.print(this.num + " ");
+            sb.append(this.num).append(' ');
         }
     }
 }
