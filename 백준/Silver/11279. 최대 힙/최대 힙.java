@@ -5,27 +5,24 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-        PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> o2 - o1);
+        PriorityQueue<Integer> pq = new PriorityQueue<>(
+                (i, j) -> j - i
+        );
+
         int n = Integer.parseInt(br.readLine());
+        StringBuilder sb = new StringBuilder();
 
-        while(n-- > 0) {
-            int input = Integer.parseInt(br.readLine());
+        while(n-->0) {
+            int p = Integer.parseInt(br.readLine());
 
-            if(input == 0) {
-                if(pq.isEmpty()) {
-                    bw.write(0 + "\n");
-                } else {
-                    bw.write(pq.poll() + "\n");
-                }
+            if(p == 0) {
+                sb.append(pq.isEmpty() ? 0 : pq.poll()).append('\n');
             } else {
-                pq.add(input);
+                pq.add(p);
             }
         }
 
-        bw.flush();
-        bw.close();
-        br.close();
+        System.out.print(sb);
     }
 }
