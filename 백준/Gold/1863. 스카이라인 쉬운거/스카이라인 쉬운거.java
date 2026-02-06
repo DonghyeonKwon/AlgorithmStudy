@@ -7,45 +7,44 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int n = Integer.parseInt(br.readLine());
-        int[] height = new int[n];
-        for(int i = 0; i <n ; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int x = Integer.parseInt(st.nextToken());
-            height[i] = Integer.parseInt(st.nextToken());
-        }
-
         Stack<Integer> stk = new Stack<>();
-        int answer = 0;
 
-        for(int h : height) {
-            if(h == 0) {
-                answer += stk.size();
+        int cnt = 0;
+        for(int i = 0; i < n; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+
+            if(b == 0) {
+                cnt += stk.size();
                 stk.clear();
-            }
-            else if(!stk.isEmpty()) {
+            } else if(!stk.isEmpty()){
                 int peek = stk.peek();
-                if(peek < h) {
-                    stk.push(h);
+                
+                if(peek < b) {
+                    stk.push(b);
                 } else {
-                    while(!stk.isEmpty() && stk.peek() > h) {
+                    while(!stk.isEmpty() && stk.peek() > b) {
                         stk.pop();
-                        answer++;
+                        cnt++;
                     }
-
-                    if(!stk.isEmpty() && stk.peek() < h) {
-                        stk.push(h);
+                    
+                    if(!stk.isEmpty() && stk.peek() < b) {
+                        stk.push(b);
                     }
+                    
                     if(stk.isEmpty()) {
-                        stk.push(h);
+                        stk.push(b);
                     }
                 }
             } else {
-                stk.push(h);
+                stk.push(b);
             }
+                
         }
 
-        answer += stk.size();
-
-        System.out.print(answer);
+        cnt += stk.size();
+        System.out.println(cnt);
     }
 }
