@@ -3,55 +3,67 @@ import java.util.*;
 
 public class Main {
     static int n;
-    static List<String> list = new ArrayList<>();
-    static String[] op = {"+", "-", " "};
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int T = Integer.parseInt(br.readLine());
-        StringBuilder sb = new StringBuilder();
-        for(int t = 0 ; t < T; t++) {
+        int t = Integer.parseInt(br.readLine());
+        while(t-->0) {
             n = Integer.parseInt(br.readLine());
-            list = new ArrayList<>();
-            go(1, "1");
 
-            if(t > 0) sb.append("\n\n");
-
-            Collections.sort(list);
-            for(int i = 0; i < list.size(); i++) {
-                sb.append(list.get(i));
-                if(i < list.size() - 1) sb.append('\n');
-            }
+            dfs(1, new char[n]);
+            if(t > 0)sb.append('\n');
         }
 
         System.out.print(sb);
     }
 
-    static void go(int idx, String str) {
+    static void dfs(int idx, char[] arr) {
         if(idx == n) {
-            String s = str.replaceAll(" ", "");
-
-            StringTokenizer st = new StringTokenizer(s, "-|+", true);
-            int sum = Integer.parseInt(st.nextToken());
-            while(st.hasMoreTokens()) {
-                String o = st.nextToken();
-                if(o.equals("+")) {
-                    sum += Integer.parseInt(st.nextToken());
+            StringBuilder tmp = new StringBuilder();
+            tmp.append(1);
+            int num = 1;
+            int prev = 1;
+            char prevOper = '+';
+            for(int i = 2; i <= n; i++) {
+                tmp.append(arr[i-1]).append(i);
+                if(arr[i-1] == ' ') {
+                    if(prevOper == '+') {
+                        num -= prev;
+                    } else {
+                        num += prev;
+                    }
+                    prev *= 10;
+                    prev += i;
+                    if(prevOper == '+') {
+                        num += prev;
+                    } else {
+                        num -= prev;
+                    }
+                } else if(arr[i-1] == '+') {
+                    num += i;
+                    prev = i;
+                    prevOper = '+';
                 } else {
-                    sum -= Integer.parseInt(st.nextToken());
+                    num -= i;
+                    prev = i;
+                    prevOper = '-';
                 }
             }
 
-            if(sum == 0) {
-                list.add(str);
+            if(num == 0) {
+                sb.append(tmp).append('\n');
             }
 
             return;
         }
 
-        for(int i = 0; i < 3; i++) {
-            go(idx + 1, str + op[i] + (idx+1));
-        }
+        arr[idx] = ' ';
+        dfs(idx+1, arr);
+        arr[idx] = '+';
+        dfs(idx+1, arr);
+        arr[idx] = '-';
+        dfs(idx+1, arr);
     }
 }
