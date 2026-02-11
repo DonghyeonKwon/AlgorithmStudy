@@ -12,58 +12,50 @@ public class Main {
         while(t-->0) {
             n = Integer.parseInt(br.readLine());
 
-            dfs(1, new char[n]);
+            dfs(2, 1, 1, '+', new char[n]);
             if(t > 0)sb.append('\n');
         }
 
         System.out.print(sb);
     }
 
-    static void dfs(int idx, char[] arr) {
-        if(idx == n) {
+    static void dfs(int idx, int num, int prev, char prevOper, char[] operArr) {
+        if(idx == n+1) {
+            if(num != 0) return;
             StringBuilder tmp = new StringBuilder();
             tmp.append(1);
-            int num = 1;
-            int prev = 1;
-            char prevOper = '+';
-            for(int i = 2; i <= n; i++) {
-                tmp.append(arr[i-1]).append(i);
-                if(arr[i-1] == ' ') {
-                    if(prevOper == '+') {
-                        num -= prev;
-                    } else {
-                        num += prev;
-                    }
-                    prev *= 10;
-                    prev += i;
-                    if(prevOper == '+') {
-                        num += prev;
-                    } else {
-                        num -= prev;
-                    }
-                } else if(arr[i-1] == '+') {
-                    num += i;
-                    prev = i;
-                    prevOper = '+';
-                } else {
-                    num -= i;
-                    prev = i;
-                    prevOper = '-';
-                }
-            }
 
-            if(num == 0) {
-                sb.append(tmp).append('\n');
+            for(int i = 2; i <= n; i++) {
+                tmp.append(operArr[i-1]).append(i);
             }
+            sb.append(tmp).append('\n');
 
             return;
         }
 
-        arr[idx] = ' ';
-        dfs(idx+1, arr);
-        arr[idx] = '+';
-        dfs(idx+1, arr);
-        arr[idx] = '-';
-        dfs(idx+1, arr);
+        //' '
+        int tmp = num;
+        int tmpPrev = prev;
+        operArr[idx-1] = ' ';
+        if(prevOper == '+') {
+            tmp -= prev;
+        } else {
+            tmp += prev;
+        }
+        tmpPrev *= 10;
+        tmpPrev += idx;
+        if(prevOper == '+') {
+            tmp += tmpPrev;
+        } else {
+            tmp -= tmpPrev;
+        }
+        dfs(idx+1, tmp, tmpPrev, prevOper, operArr);
+
+        //'+'
+        operArr[idx-1] = '+';
+        dfs(idx+1, num + idx, idx, '+', operArr);
+
+        operArr[idx-1] = '-';
+        dfs(idx+1, num - idx, idx, '-', operArr);
     }
 }
