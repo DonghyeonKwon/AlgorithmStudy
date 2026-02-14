@@ -3,12 +3,12 @@ import java.util.*;
 
 public class Main {
     static int n, m, k;
-    static int[][][] distPriority;
-    static int[][] map, smell;
-    static Shark[] shark;
+    static Shark[] arr;
+    static Smell[][] sMap;
 
-    static int[] dy = {-1, 1, 0, 0};
-    static int[] dx = {0, 0, -1, 1};
+    static int[] dy = {0, -1, 1, 0, 0};
+    static int[] dx = {0, 0, 0, -1, 1};
+    static int[][][] dd;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -18,133 +18,119 @@ public class Main {
         m = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
 
-        distPriority = new int[m+1][4][4];
-        shark = new Shark[m+1];
-        map = new int[n+1][n+1];
-        smell = new int[n+1][n+1];
+        arr = new Shark[m+1];
+        sMap = new Smell[n][n];
+        dd = new int[m+1][5][4];
 
-        for(int i = 1; i <= n; i++) {
+        for(int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j = 1; j <= n; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-                if(map[i][j] > 0) {
-                    shark[map[i][j]] = new Shark(i, j, 0);
-                    smell[i][j] = k;
+            for(int j = 0; j < n; j++) {
+                int num = Integer.parseInt(st.nextToken());
+                sMap[i][j] = new Smell(num, num == 0 ? 0 : k);
+
+                if(num > 0) {
+                    arr[num] = new Shark(i, j, 0);
                 }
             }
         }
 
         st = new StringTokenizer(br.readLine());
         for(int i = 1; i <= m; i++) {
-            shark[i].d = Integer.parseInt(st.nextToken()) - 1;
+            arr[i].d = Integer.parseInt(st.nextToken());
         }
 
         for(int i = 1; i <= m; i++) {
-            for(int j = 0; j < 4; j++) {
+            for(int j = 1; j <= 4; j++) {
                 st = new StringTokenizer(br.readLine());
-                for(int k = 0; k < 4; k++) {
-                    distPriority[i][j][k] = Integer.parseInt(st.nextToken()) - 1;
+                for(int d = 0; d < 4; d++) {
+                    dd[i][j][d] = Integer.parseInt(st.nextToken());
                 }
             }
         }
 
-        int time = 0;
-
-        while(true) {
-            int count = 0;
-            for(int i = 1; i <= m; i++) {
-                if(shark[i] != null) count++;
-            }
-
-            if(count == 1 && shark[1] != null) {
-                break;
-            }
-
-            if(time >= 1000) {
-                time = -1;
-                break;
-            }
-
-            int[][] tmp = new int[n+1][n+1];
-
-            for(int i = 1; i <= m; i++) {
-                if(shark[i] != null){
-                    moveShark(tmp, i);
-                }
-            }
-
-            for(int i = 1; i <= n; i++) {
-                for(int j = 1; j <= n; j++) {
-                    if(smell[i][j] > 0) {
-                        smell[i][j]--;
-                    }
-
-                    if(smell[i][j] == 0) {
-                        map[i][j] = 0;
-                    }
-                }
-            }
-
-            for(int i = 1; i <= n; i++) {
-                for(int j = 1; j <= n; j++) {
-                    if(tmp[i][j] > 0) {
-                        smell[i][j] = k;
-                        map[i][j] = tmp[i][j];
-                    }
-                }
-            }
-
-            time++;
-        }
-
-        System.out.print(time);
+        int ans = simulation();
+        System.out.print(ans);
     }
 
-    static void moveShark(int[][] tmp, int num) {
-        boolean flag = false;
-        Shark s = shark[num];
-        int ny = 0;
-        int nx = 0;
-        int nd = 0;
-        for(int i = 0; i < 4; i++) {
-            nd = distPriority[num][s.d][i];
-            ny = s.y + dy[nd];
-            nx = s.x + dx[nd];
+    static int simulation() {
+        int t = 0;
+        while(t < 1000) {
+            t++;
 
-            if(ny >= 1 && ny <= n && nx >= 1 && nx <= n && map[ny][nx] == 0) {
-                flag = true;
-                break;
-            }
-        }
+            Smell[][] temp = new Smell[n][n];
+            for(int idx = 1; idx <= m; idx++) {
+                if(arr[idx].d == -1) continue;
 
-        if(!flag) {
-            for(int i = 0; i < 4; i++) {
-                nd = distPriority[num][s.d][i];
-                ny = s.y + dy[nd];
-                nx = s.x + dx[nd];
+                Shark s = arr[idx];
+                int nextD1 = 0, nextD2 = 0;
+                for(int i = 0; i < 4; i++) {
+                    int ny = s.y + dy[dd[idx][s.d][i]];
+                    int nx = s.x + dx[dd[idx][s.d][i]];
 
-                if(ny >= 1 && ny <= n && nx >= 1 && nx <= n && map[ny][nx] == num) {
-                    break;
+                    if(ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
+                    if(sMap[ny][nx].idx > 0 && sMap[ny][nx].idx != idx) continue;
+                    if(sMap[ny][nx].idx == 0) {
+                        nextD1 = dd[idx][s.d][i];
+                        break;
+                    }
+                    if(nextD2 == 0)nextD2 = dd[idx][s.d][i];
+                }
+
+                int nextD = nextD1 == 0 ? nextD2 : nextD1;
+                s.y += dy[nextD];
+                s.x += dx[nextD];
+                s.d = nextD;
+
+                if(temp[s.y][s.x] != null) {
+                    if(temp[s.y][s.x].idx < idx) {
+                        s.d = -1;
+                    } else {
+                        arr[temp[s.y][s.x].idx].d = -1;
+                        temp[s.y][s.x].idx = idx;
+                    }
+                } else {
+                    temp[s.y][s.x] = new Smell(idx, k);
                 }
             }
+
+
+            int cnt = 0;
+            for(int i = 0; i < n; i++) {
+                for(int j = 0; j < n; j++) {
+                    if(temp[i][j] == null) {
+                        sMap[i][j].s -= 1;
+                        if(sMap[i][j].s == 0) sMap[i][j].idx = 0;
+                    } else {
+                        sMap[i][j] = temp[i][j];
+                        cnt++;
+                    }
+                }
+            }
+
+
+            if(cnt == 1) return t;
         }
 
-        if(tmp[ny][nx] == 0) {
-            tmp[ny][nx] = num;
-            s.y = ny;
-            s.x = nx;
-            s.d = nd;
-        } else {
-            shark[num] = null;
-        }
+        return -1;
     }
 
-    static class Shark{
+    static class Shark {
         int y, x, d;
+
         Shark(int y, int x, int d) {
             this.y = y;
             this.x = x;
             this.d = d;
+        }
+    }
+
+    static class Smell {
+        int idx;
+        int s;
+
+        Smell(int idx, int s) {
+            this.idx = idx;
+            this.s = s;
         }
     }
 }
