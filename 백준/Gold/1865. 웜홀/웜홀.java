@@ -53,7 +53,7 @@ public class Main {
                 int c = Integer.parseInt(st.nextToken());
 
                 list.add(new Edge(a, b, -c));
-                values[0][b] = 0;
+                values[0][a] = 0;
             }
 
 
