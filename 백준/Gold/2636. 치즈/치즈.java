@@ -2,80 +2,75 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, m, cCnt;
+    static int r, c, zeroCnt = 0;
+    static int[][] map;
+    static boolean[][] visited;
     static int[] dy = {-1, 0, 1, 0};
     static int[] dx = {0, -1, 0, 1};
 
-    static int[][] map;
-    static boolean[][] visited;
-    static Queue<int[]> air = new ArrayDeque<>();
-    static List<int[]> cheese = new ArrayList<>();
-
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
 
-        map = new int[n][m];
-        visited = new boolean[n][m];
+        r = Integer.parseInt(st.nextToken());
+        c = Integer.parseInt(st.nextToken());
 
-        for(int i = 0; i < n; i++){
+        map = new int[r][c];
+        visited = new boolean[r][c];
+
+        for(int i = 0; i < r; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j = 0; j < m; j++){
-                if(i == 0 || i == n-1 || j == 0 || j == m-1){
-                    air.add(new int[]{i, j});
-                }
+            for(int j = 0; j < c; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-                if(map[i][j] == 1) cCnt++;
+                if(map[i][j] == 0) zeroCnt++;
             }
         }
 
-        int time = 0;
+        Queue<int[]> q = new ArrayDeque<>();
+        q.add(new int[]{0, 0});
+        Queue<int[]> temp = new ArrayDeque<>();
 
+        int time = 0;
+        int ans = 0;
         while(true) {
-            while(!air.isEmpty()){
-                int[] pos = air.poll();
+            time++;
+
+            while(!q.isEmpty()) {
+                int[] pos = q.poll();
+                int y = pos[0];
+                int x = pos[1];
 
                 for(int i = 0; i < 4; i++) {
-                    int ny = pos[0] + dy[i];
-                    int nx = pos[1] + dx[i];
+                    int ny = y + dy[i];
+                    int nx = x + dx[i];
 
-                    if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
+                    if(ny < 0 || ny >= r || nx < 0 || nx >= c) continue;
                     if(visited[ny][nx]) continue;
-
-                    if(map[ny][nx] == 1) {
-                        cheese.add(new int[]{ny, nx});
-                    } else {
+                    if(map[ny][nx] == 0) {
                         visited[ny][nx] = true;
-                        air.offer(new int[]{ny, nx});
+                        q.add(new int[]{ny, nx});
+                    } else {
+                        temp.add(new int[]{ny, nx});
                     }
                 }
             }
 
-            int cnt = 0;
-            for(int[] pos : cheese) {
-                if(map[pos[0]][pos[1]] == 1){
+            ans = 0;
+            while(!temp.isEmpty()) {
+                int[] pos = temp.poll();
+                if(map[pos[0]][pos[1]] == 1) {
                     map[pos[0]][pos[1]] = 0;
-                    air.offer(pos);
-                    cnt++;
+                    q.add(pos);
+                    ans++;
                 }
             }
-            
-            if(cnt == 0) break;
 
-            cCnt = cnt;
-            time++;
+            zeroCnt += ans;
+            if(zeroCnt == r * c) {
+                break;
+            }
         }
 
-        bw.write(Integer.toString(time));
-        bw.write('\n');
-        bw.write(Integer.toString(cCnt));
-        bw.flush();
-
-        bw.close();
-        br.close();
+        System.out.print(time + "\n" + ans);
     }
 }
