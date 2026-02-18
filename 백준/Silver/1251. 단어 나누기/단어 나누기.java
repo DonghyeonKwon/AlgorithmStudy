@@ -2,52 +2,47 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static String res = null;
-    static int n;
-    static char[] input;
-    static int[] select = new int[3];
+    static String ans = null;
+    static String input;
+
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        input = br.readLine();
 
-        input = br.readLine().toCharArray();
-        n = input.length;
+        dfs(0,  0, new int[2]);
 
-        go(0, 0);
-
-        System.out.println(res);
+        System.out.print(ans);
     }
 
-    static void go(int idx, int cnt) {
-        if(cnt < 3 && idx >= n) return;
+    static void dfs(int idx, int cnt, int[] arr) {
+        if(idx >= input.length() && cnt <= 2) return;
 
-        if(cnt == 3) {
+        if(cnt == 2) {
             StringBuilder sb = new StringBuilder();
+            for(int i = arr[0]; i >= 0; i--) {
+                sb.append(input.charAt(i));
+            }
 
-            sb.append(word(0, select[0]));
-            sb.append(word(select[0]+1, select[1]));
-            sb.append(word(select[1]+1, n-1));
-            if(res == null) {
-                res = String.valueOf(sb);
+            for(int i = arr[1]; i > arr[0]; i--) {
+                sb.append(input.charAt(i));
+            }
+
+            for(int i = input.length() - 1; i > arr[1]; i--) {
+                sb.append(input.charAt(i));
+            }
+
+            if(ans == null) {
+                ans = sb.toString();
             } else {
-                res = res.compareTo(sb.toString()) > 0 ? sb.toString() : res;
+                ans = ans.compareTo(sb.toString()) > 0 ? sb.toString() : ans;
             }
 
             return;
         }
 
-        for(int i = idx; i <= n; i++) {
-            select[cnt] = i;
-            go(i+1, cnt+1);
+        for(int i = idx; i < input.length(); i++) {
+            arr[cnt] = i;
+            dfs(i + 1, cnt + 1, arr);
         }
-    }
-
-    static String word(int i, int k) {
-        StringBuilder sb = new StringBuilder();
-
-        for(; i <= k; i++) {
-            sb.append(input[i]);
-        }
-
-        return sb.reverse().toString();
     }
 }
