@@ -2,42 +2,39 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, k, res = 0;
+    static int n, k, cnt = 0;
     static int[] arr;
-    static boolean[] visited;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
 
+        StringTokenizer st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
-        arr = new int[n];
-        visited = new boolean[n];
 
+        arr = new int[n];
         st = new StringTokenizer(br.readLine());
         for(int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        combi(0, 500);
+        go(0, 0, 500);
 
-        System.out.println(res);
+        System.out.print(cnt);
     }
 
-    static void combi(int cnt, int sum){
-        if(sum < 500) return;
-
-        if(cnt == n) {
-            res++;
+    static void go(int idx, int visited, int w) {
+        if(idx == n) {
+            cnt++;
             return;
         }
 
-        for(int i = 0; i < n; i++){
-            if(visited[i]) continue;
-            visited[i] = true;
-            combi(cnt+1, sum+arr[i]-k);
-            visited[i] = false;
+        for(int i = 0; i < n; i++) {
+            if((visited & (1 << i)) > 0) continue;
+            int nextW = w + arr[i] - k;
+            if(nextW < 500) continue;
+
+            go(idx + 1, visited | (1 << i), nextW);
         }
     }
 }
