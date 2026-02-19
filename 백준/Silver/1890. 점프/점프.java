@@ -39,6 +39,7 @@ public class Main {
         }
 
         dp[y][x] = 0;
+        if(value == 0) return dp[y][x];
         for(int i = 0; i < 2; i++) {
             int ny = y + dy[i] * value;
             int nx = x + dx[i] * value;
