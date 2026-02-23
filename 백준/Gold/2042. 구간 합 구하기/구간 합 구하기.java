@@ -2,89 +2,81 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		StringBuilder sb = new StringBuilder();
-		
-		int N = Integer.parseInt(st.nextToken());
-		int M = Integer.parseInt(st.nextToken());
-		int K = Integer.parseInt(st.nextToken());
-		
-		long[] arr = new long[N+1];
-		
-		for(int i = 1; i <= N; i++) {
-			arr[i] = Long.parseLong(br.readLine());
-		}
-		
-		SegmentTree stree = new SegmentTree(N);
-		
-		stree.init(arr, 1, 1, N);
-		
-		for(int i = 0; i < M+K; i++) {
-			st = new StringTokenizer(br.readLine());
-			int cmd = Integer.parseInt(st.nextToken());
-			int a = Integer.parseInt(st.nextToken());
-			long b = Long.parseLong(st.nextToken());
-			
-			if(cmd == 1) {
-				stree.update(1, 1, N, a, b-arr[a]);
-				arr[a] = b;
-				continue;
-			}
-			sb.append(stree.sum(1, 1, N, a, (int)b)).append('\n');
-		}
-		System.out.print(sb);
-	}
-	
-	static class SegmentTree{
-		int size;
-		long[] tree;
-		
-		SegmentTree(int n) {
-			int h = (int)Math.ceil(Math.log(n)/Math.log(2));
-			this.size = pow(2, h+1);
-			tree = new long[this.size];
-		}
-		
-		public void init(long[] arr, int node, int start, int end) {
-			if(start == end) {
-				this.tree[node] = arr[start];
-				return;
-			}
-			init(arr, node*2, start, (start+end)/2);
-			init(arr, node*2+1, (start+end)/2 + 1, end);
-			this.tree[node] = this.tree[node*2] + this.tree[node*2 + 1];
-		}
-		
-		public void update(int node, int start, int end, int idx, long diff) {
-			if(idx < start || end < idx) return;
-			
-			this.tree[node] += diff;
-			
-			if(start != end) {
-				update(node*2, start, (start + end)/2, idx, diff);
-				update(node*2 + 1, (start + end)/2 + 1, end, idx, diff);
-			}
-		}
-		
-		public long sum(int node, int start, int end, int left, int right) {
-			if(left > end || right < start) {
-				return 0;
-			}
-			
-			if(left <= start && end <= right) {
-				return tree[node];
-			}
-			
-			return sum(node*2, start, (start+end)/2, left, right) +
-					sum(node*2 + 1, (start+end)/2 + 1, end, left, right);
-		}
-	}
-	
-	static int pow(int n, int k) {
-		if(k == 1) return n;
-		if(k % 2 == 1) return pow(n, k/2) * pow(n, k/2) * n;
-		return pow(n, k/2) * pow(n, k/2);
-	}
+    static long[] arr;
+    static long[] segTree;
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int n = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
+
+        arr = new long[n+1];
+        segTree = new long[4*n + 1];
+        for(int i = 1; i <= n; i++) {
+            arr[i] = Long.parseLong(br.readLine());
+        }
+
+        init(1, n, 1);
+
+        StringBuilder sb = new StringBuilder();
+
+        for(int i = 0; i < m + k; i++) {
+            st = new StringTokenizer(br.readLine());
+
+            int q = Integer.parseInt(st.nextToken());
+
+            if(q == 1) {
+                int a = Integer.parseInt(st.nextToken());
+                long b = Long.parseLong(st.nextToken());
+                long val = b - arr[a];
+                arr[a] = b;
+                update(1, n, 1, a, val);
+            } else {
+                int a = Integer.parseInt(st.nextToken());
+                int b = Integer.parseInt(st.nextToken());
+                sb.append(get(1, n, 1, a, b)).append('\n');
+            }
+        }
+
+        System.out.print(sb);
+    }
+
+    static long get(int l, int r, int node, int s, int e) {
+        if(e < l || s > r) return 0;
+        if(s <= l && r <= e) return segTree[node];
+
+        int mid = (l + r) / 2;
+        return get(l, mid, node * 2, s, e) + get(mid + 1, r, node * 2 + 1, s, e);
+    }
+
+    static void update(int l, int r, int node, int target, long value) {
+        if(target < l || target > r) return;
+
+        segTree[node] += value;
+
+        if(l == r) return;
+
+        int mid = (l + r) / 2;
+        update(l, mid, node * 2, target, value);
+        update(mid + 1, r, node * 2 + 1, target, value);
+    }
+
+    static void init(int l, int r, int node) {
+        if(r < l) return;
+
+        if(l == r) {
+            segTree[node] = arr[l];
+            return;
+        }
+
+        int mid = (l + r) / 2;
+        init(l, mid, node * 2);
+        init(mid + 1, r, node * 2 + 1);
+
+        segTree[node] = segTree[node * 2] + segTree[node * 2 + 1];
+    }
 }
