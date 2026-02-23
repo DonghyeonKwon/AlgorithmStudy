@@ -2,8 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int s, N, K, r1, r2, c1, c2, p;
-    static int[][] ans;
+    static int s, N, K, r1, r2, c1, c2, p, len;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -17,26 +16,12 @@ public class Main {
         c1 = Integer.parseInt(st.nextToken());
         c2 = Integer.parseInt(st.nextToken());
         p = (N - K) / 2;
-
-        ans = new int[r2 - r1 + 1][c2 - c1 + 1];
-
-        if(s == 0) {
-            System.out.print(0);
-            return;
-        }
-
-        int maxN = N;
-
-        for(int i = 1; i < s; i++) {
-            maxN *= N;
-        }
-
-        go(0, 0, maxN, false);
+        len = (int)Math.pow(N, s);
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < r2 - r1 + 1; i++) {
-            for(int k : ans[i]) {
-                sb.append(k);
+        for(int y = r1; y <= r2; y++) {
+            for(int x = c1; x <= c2; x++) {
+                sb.append(getColor(y, x));
             }
             sb.append('\n');
         }
@@ -44,45 +29,22 @@ public class Main {
         System.out.print(sb);
     }
 
-    static void go(int sx, int sy, int cnt, boolean black) {
-        if(check(sx, sy, cnt)) {
-            if(black) {
-                for(int y = sy; y < sy + cnt; y++) {
-                    for(int x = sx; x < sx + cnt; x++) {
-                        if((r1 <= y && y <= r2) && (c1 <= x && x <= c2)) {
-                            ans[y - r1][x - c1] = 1;
-                        }
-                    }
-                }
-                return;
-            }
+    static int getColor(int y, int x) {
+        int size = len;
 
-            if(cnt == N) {
-                for(int y = sy; y < sy + cnt; y++) {
-                    for(int x = sx; x < sx + cnt; x++) {
-                        if((r1 <= y && y <= r2) && (c1 <= x && x <= c2)) {
-                            if(sy + p <= y && y < sy + cnt - p && sx + p <= x && x < sx + cnt - p) {
-                                ans[y - r1][x - c1] = 1;
-                            } else {
-                                ans[y - r1][x - c1] = 0;
-                            }
-                        }
-                    }
-                }
-                return;
-            }
+        while(size > 1) {
+            int ds = size / N;
 
-            int nextLen = cnt / N;
-            for(int i = 0; i < N; i++) {
-                for(int j = 0; j < N; j++) {
-                    go(sx + nextLen * i, sy + nextLen * j, nextLen, p <= i && i < N - p && p <= j && j < N - p);
-                }
-            }
+            int ny = y / ds;
+            int nx = x / ds;
+
+            if(p <= ny && ny < p + K && p <= nx && nx < p + K) return 1;
+
+            y %= ds;
+            x %= ds;
+            size = ds;
         }
 
-    }
-
-    static boolean check(int sx, int sy, int cnt) {
-        return !(sx > c2 || sx + cnt - 1 < c1 || sy > r2 || sy + cnt - 1 < r1);
+        return 0;
     }
 }
