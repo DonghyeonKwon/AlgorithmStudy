@@ -3,87 +3,63 @@ import java.util.*;
 
 public class Main {
     static int n, m;
-
+    static int[][] map;
+    static boolean[][] visited;
+    static int[][] tmpMap;
     static int[] dy = {-1, 0, 1, 0};
     static int[] dx = {0, -1, 0, 1};
 
-    static int[][] map;
-    static boolean[][] visited;
-    static Queue<int[]> ice = new ArrayDeque<>();
-    static Queue<int[]> melted = new ArrayDeque<>();
-
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
 
         map = new int[n][m];
+
         for(int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             for(int j = 0; j < m; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-                if(map[i][j] > 0) ice.offer(new int[]{i, j});
             }
         }
 
         int time = 0;
-        while(true) {
-            while(!ice.isEmpty()){
-                int[] pos = ice.poll();
+        boolean flag = false;
+        int cnt = 0;
+        while(!flag) {
+            visited = new boolean[n][m];
+            tmpMap = new int[n][m];
 
-                for(int d = 0; d < 4; d++) {
-                    int ny = pos[0] + dy[d];
-                    int nx = pos[1] + dx[d];
+            cnt = 0;
 
-                    if(map[ny][nx] == 0) melted.offer(new int[]{pos[0], pos[1]});
+            for(int i = 0; !flag && i < n; i++) {
+                for(int j = 0; j < m; j++) {
+                    if(map[i][j] > 0 && !visited[i][j]) {
+                        if(cnt > 0) {
+                            flag = true;
+                            break;
+                        }
+                        bfs(i, j);
+                        cnt++;
+                    }
                 }
             }
 
-            while (!melted.isEmpty()) {
-                int[] pos = melted.poll();
-                int y = pos[0];
-                int x = pos[1];
-
-                if(map[y][x] == 0) continue;
-
-                map[y][x]--;
-            }
+            map = tmpMap;
+            if(flag || cnt == 0) break;
 
             time++;
-
-            visited = new boolean[n][m];
-            int cnt = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    if (map[i][j] == 0) continue;
-                    if (visited[i][j]) continue;
-
-                    count_bfs(i, j);
-                    cnt++;
-                }
-            }
-
-            if(cnt > 1) break;
-
-            if(cnt == 0) {
-                time = 0;
-                break;
-            }
         }
 
-        bw.write(Integer.toString(time));
-        bw.flush();
+        System.out.print(flag ? time : 0);
 
-        bw.close();
-        br.close();
     }
 
-    static void count_bfs(int y, int x){
+    static void bfs(int y, int x) {
         Queue<int[]> q = new ArrayDeque<>();
-        q.offer(new int[]{y, x});
+        q.add(new int[]{y, x});
         visited[y][x] = true;
 
         while(!q.isEmpty()) {
@@ -91,19 +67,22 @@ public class Main {
             y = pos[0];
             x = pos[1];
 
-            ice.offer(new int[]{y, x});
-
-            for(int d = 0; d < 4; d++) {
-                int ny = y + dy[d];
-                int nx = x + dx[d];
+            int cnt = 0;
+            for(int i = 0; i < 4; i++) {
+                int ny = y + dy[i];
+                int nx = x + dx[i];
 
                 if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
-                if(visited[ny][nx]) continue;
-                if(map[ny][nx] == 0) continue;
-
-                q.offer(new int[]{ny,nx});
-                visited[ny][nx] = true;
+                if(map[ny][nx] == 0) {
+                    cnt++;
+                } else {
+                    if(visited[ny][nx]) continue;
+                    visited[ny][nx] = true;
+                    q.add(new int[]{ny, nx});
+                }
             }
+
+            tmpMap[y][x] = Math.max(0, map[y][x] - cnt);
         }
     }
 }
