@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Main {
     static int n, black = 0, white = 0;
-    static int[][] arr;
+    static int[][] map;
     static boolean[][] visited;
 
     static int[] dy = {-1, -1, 1, 1};
@@ -11,31 +11,29 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         n = Integer.parseInt(br.readLine());
-        arr = new int[n][n];
+
+        map = new int[n][n];
         visited = new boolean[n][n];
         for(int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-
             for(int j = 0; j < n; j++) {
-                arr[i][j]  = Integer.parseInt(st.nextToken());
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        go(0, 0, 0, 0);
-        go(0, 1, 1, 0);
-
+        dfs(0, 0, 0, 0);
+        dfs(0, 1, 1, 0);
 
         System.out.print(black + white);
     }
 
-    static void go(int y, int x, int color, int cnt) {
-        if(y >= n) {
+    static void dfs(int y, int x, int color, int cnt) {
+        if(y == n) {
             if(color == 0) {
-                black = Math.max(black, cnt);
+                black = Math.max(cnt, black);
             } else {
-                white = Math.max(white, cnt);
+                white = Math.max(cnt, white);
             }
             return;
         }
@@ -45,30 +43,30 @@ public class Main {
 
         if(nx >= n) {
             ny += 1;
-            if(color == ny % 2) nx = 0;
-            else nx = 1;
+            if(color == 0) nx = ny % 2 == 0 ? 0 : 1;
+            else nx =  ny % 2 == 0 ? 1 : 0;
         }
 
-        if(arr[y][x] == 0) {
-            go(ny, nx, color, cnt);
+        if(map[y][x] == 0) {
+            dfs(ny, nx, color, cnt);
             return;
         }
 
         if(check(y, x)) {
             visited[y][x] = true;
-            go(ny, nx, color, cnt + 1);
+            dfs(ny, nx, color, cnt + 1);
             visited[y][x] = false;
         }
-
-        go(ny, nx, color, cnt);
+        dfs(ny, nx, color, cnt);
     }
 
-
     static boolean check(int y, int x) {
+        if(visited[y][x]) return false;
+
         for(int d = 0; d < 4; d++) {
+
             int ny = y + dy[d];
             int nx = x + dx[d];
-
             while(0 <= ny && ny < n && 0 <= nx && nx < n) {
                 if(visited[ny][nx]) return false;
                 ny += dy[d];
