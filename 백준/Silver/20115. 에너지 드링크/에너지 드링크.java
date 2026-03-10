@@ -5,23 +5,20 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         int n = Integer.parseInt(br.readLine());
-        PriorityQueue<Double> pq = new PriorityQueue<>();
-
         StringTokenizer st = new StringTokenizer(br.readLine());
+
+        double[] arr = new double[n];
         for(int i = 0; i < n; i++) {
-            pq.add(Double.parseDouble(st.nextToken()));
+            arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        double sum = 0;
-        while(pq.size() > 1) {
-            sum += (pq.poll() / 2);
+        Arrays.sort(arr);
+
+        for(int i = 0; i < n-1; i++) {
+            arr[n-1] += arr[i]/2;
         }
 
-        sum += pq.poll();
-        sum = (double) Math.round(sum * 10000) / 10000;
-
-        System.out.print(sum);
+        System.out.print(arr[n-1]);
     }
 }
