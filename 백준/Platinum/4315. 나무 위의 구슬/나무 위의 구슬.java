@@ -2,42 +2,40 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n;
     static int[] cnt, parent;
-    static List<Integer>[] tree;
+    static List<Integer>[] list;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder sb = new StringBuilder();
 
         while(true) {
-            n = Integer.parseInt(br.readLine());
-
+            int n = Integer.parseInt(br.readLine());
             if(n == 0) break;
 
+            list = new ArrayList[n+1];
             cnt = new int[n+1];
             parent = new int[n+1];
-            tree = new ArrayList[n+1];
             for(int i = 1; i <= n; i++) {
-                tree[i] = new ArrayList<>();
-                parent[i] = -1;
+                list[i] = new ArrayList<>();
             }
 
             for(int i = 1; i <= n; i++) {
                 StringTokenizer st = new StringTokenizer(br.readLine());
 
-                int v = Integer.parseInt(st.nextToken());
-                cnt[v] = Integer.parseInt(st.nextToken());
+                int a = Integer.parseInt(st.nextToken());
+                cnt[a] = Integer.parseInt(st.nextToken());
 
-                int childCnt = Integer.parseInt(st.nextToken());
-                for(int j = 0; j < childCnt; j++) {
-                    int child = Integer.parseInt(st.nextToken());
-                    parent[child] = v;
-                    tree[v].add(child);
+                int m = Integer.parseInt(st.nextToken());
+                for(int j = 0; j < m; j++) {
+                    int b = Integer.parseInt(st.nextToken());
+                    list[a].add(b);
+                    parent[b] = a;
                 }
             }
+
             for(int i = 1; i <= n; i++) {
-                if(parent[i] == -1) {
+                if(parent[i] == 0) {
                     dfs(i);
                     break;
                 }
@@ -54,13 +52,11 @@ public class Main {
         System.out.print(sb);
     }
 
-    static int dfs(int node) {
-        int pp = cnt[node] - 1;
-        
-        for(int next : tree[node]) {
+    static int dfs(int now) {
+        int pp = cnt[now] - 1;
+        for(int next : list[now]) {
             pp += dfs(next);
         }
-
-        return cnt[node] = pp;
+        return cnt[now] = pp;
     }
 }
