@@ -2,71 +2,47 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n;
-    static char[] arr;
-    static Map<Character, Character> map = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        arr = br.readLine().toCharArray();
-        n = arr.length;
-
-        if(arr[0] != 'w') {
-            System.out.print(0);
-            return;
-        }
-
+        char[] arr = br.readLine().toCharArray();
         boolean flag = true;
+        int w = 0;
 
-        map.put('w', 'o');
-        map.put('o', 'l');
-        map.put('l', 'f');
-        map.put('f', '0');
-
-        int cnt = 0;
-        for(int i = 0; i < n && flag; i++) {
+        for(int i = 0; flag && i < arr.length; i++) {
             if(arr[i] == 'w') {
-                cnt++;
+                w++;
             } else {
-                if(cnt == 0) {
+                if(w == 0) {
                     flag = false;
                     break;
                 }
-                flag = check(i, cnt, 'o');
+                
+                if(i + w * 3 - 1 >= arr.length) {
+                    flag = false;
+                    break;
+                }
+                
+                int j = 0;
+                for(int k = 1; flag && k <= 3; k++) {
+                    for(j = i + w * (k - 1); j < i + w * k; j++) {
+                        if((k == 1 && arr[j] != 'o') || (k == 2 && arr[j] != 'l') || (k == 3 && arr[j] != 'f')) {
+                            flag = false;
+                            break;
+                        }
+                    }
+                }
+
                 if(flag) {
-                    i += cnt * 3;
-                    i -= 1;
-                    cnt = 0;
+                    i += w * 3 - 1;
+                    w = 0;
                 }
             }
         }
 
-        if(cnt != 0) flag = false;
+        if(w != 0) flag = false;
 
         System.out.print(flag ? 1 : 0);
-    }
-
-    static boolean check(int idx, int cnt, char c) {
-        if(c == '0') return true;
-
-        int tempCnt = 0;
-        for(int i = idx; i < n; i++) {
-            if(arr[i] == c) {
-                tempCnt++;
-            } else {
-                if(tempCnt == cnt) {
-                    return check(i, tempCnt, map.get(c));
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        if(tempCnt == cnt) {
-            return c == 'f';
-        }
-
-        return false;
     }
 }
