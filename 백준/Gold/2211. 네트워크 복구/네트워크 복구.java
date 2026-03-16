@@ -2,8 +2,8 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static int n, m;
-    static List<Edge>[] list;
+    static int n;
+    static List<int[]>[] list;
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws Exception {
@@ -11,7 +11,8 @@ public class Main {
         StringTokenizer st = new StringTokenizer(br.readLine());
 
         n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+
         list = new ArrayList[n+1];
         for(int i = 1; i <= n; i++) {
             list[i] = new ArrayList<>();
@@ -19,22 +20,25 @@ public class Main {
 
         for(int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
+            int[] arr = new int[3];
+            for(int j = 0; j < 3; j++) {
+                arr[j] = Integer.parseInt(st.nextToken());
+            }
 
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
-            int c = Integer.parseInt(st.nextToken());
-
-            list[u].add(new Edge(v, c));
-            list[v].add(new Edge(u, c));
+            list[arr[0]].add(new int[]{arr[1], arr[2]});
+            list[arr[1]].add(new int[]{arr[0], arr[2]});
         }
+
+        sb.append(n-1).append('\n');
         dijkstra();
 
-        System.out.println(n-1);
         System.out.print(sb);
     }
 
     static void dijkstra() {
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        PriorityQueue<int[]> pq = new PriorityQueue<>(
+                (a, b) -> a[1] - b[1]
+        );
         boolean[] visited = new boolean[n+1];
         int[] value = new int[n+1];
         Arrays.fill(value, Integer.MAX_VALUE);
@@ -42,49 +46,28 @@ public class Main {
         visited[1] = true;
         int cnt = 1;
 
-        for(Edge next : list[1]) {
-            if(value[next.v] > next.c) {
-                value[next.v] = next.c;
-                pq.add(new Edge(next.v, value[next.v], 1));
+        for(int[] next : list[1]) {
+            if(value[next[0]] > next[1]) {
+                value[next[0]] = next[1];
+                pq.add(new int[]{next[0], next[1], 1});
             }
         }
 
         while(!pq.isEmpty()) {
-            Edge now = pq.poll();
+            int[] now = pq.poll();
 
-            if(visited[now.v]) continue;
+            if(visited[now[0]]) continue;
             cnt++;
-            sb.append(now.prev).append(' ').append(now.v).append('\n');
-            visited[now.v] = true;
+            sb.append(now[2]).append(' ').append(now[0]).append('\n');
+            visited[now[0]] = true;
 
             if(cnt == n) break;
-            for(Edge next : list[now.v]) {
-                if(value[next.v] > next.c + now.c) {
-                    value[next.v] = next.c + now.c;
-                            pq.add(new Edge(next.v, value[next.v], now.v));
+            for(int[] next : list[now[0]]) {
+                if(value[next[0]] > now[1] + next[1]) {
+                    value[next[0]] = now[1] + next[1];
+                    pq.add(new int[]{next[0], value[next[0]], now[0]});
                 }
             }
-        }
-    }
-
-    static class Edge implements Comparable<Edge> {
-        int v, c;
-        int prev;
-
-        Edge(int v, int c) {
-            this.v = v;
-            this.c = c;
-        }
-
-        Edge(int v, int c, int prev) {
-            this.v = v;
-            this.c = c;
-            this.prev = prev;
-        }
-
-        @Override
-        public int compareTo(Edge o) {
-            return this.c - o.c;
         }
     }
 }
