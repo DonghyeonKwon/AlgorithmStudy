@@ -4,15 +4,13 @@ import java.util.*;
 public class Main {
     static int n;
     static int[] degree;
-    static List<Edge>[] list;
-    static List<Edge>[] revList;
+    static List<Edge>[] list, revList;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
 
         n = Integer.parseInt(br.readLine());
-        int m = Integer.parseInt(br.readLine());
-
         degree = new int[n+1];
         list = new ArrayList[n+1];
         revList = new ArrayList[n+1];
@@ -21,10 +19,9 @@ public class Main {
             revList[i] = new ArrayList<>();
         }
 
-        StringTokenizer st;
+        int m = Integer.parseInt(br.readLine());
         for(int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
-
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
             int c = Integer.parseInt(st.nextToken());
@@ -35,30 +32,30 @@ public class Main {
         }
 
         st = new StringTokenizer(br.readLine());
-        int s = Integer.parseInt(st.nextToken());
-        int e = Integer.parseInt(st.nextToken());
+        int a = Integer.parseInt(st.nextToken());
+        int b = Integer.parseInt(st.nextToken());
 
-        search(s, e);
+        bfs(a, b);
     }
 
-    static void search(int s, int e) {
+    static void bfs(int a, int b) {
         Queue<Edge> q = new ArrayDeque<>();
-        int[] values = new int[n+1];
-        q.add(new Edge(s, 0));
+        int[] value = new int[n+1];
+        q.add(new Edge(a, 0));
 
         while(!q.isEmpty()) {
             Edge pos = q.poll();
 
             for(Edge next : list[pos.v]) {
-                values[next.v] = Math.max(values[next.v], pos.w + next.w);
+                value[next.v] = Math.max(value[next.v], next.c + pos.c);
                 if(--degree[next.v] == 0) {
-                    q.add(new Edge(next.v, values[next.v]));
+                    q.add(new Edge(next.v, value[next.v]));
                 }
             }
         }
 
         boolean[] visited = new boolean[n+1];
-        q.add(new Edge(e, 0));
+        q.add(new Edge(b, 0));
         int cnt = 0;
 
         while(!q.isEmpty()) {
@@ -67,23 +64,23 @@ public class Main {
             if(visited[now.v]) continue;
             visited[now.v] = true;
 
-            for(Edge next : revList[now.v]) {
-                if(values[now.v] - next.w == values[next.v]) {
+            for(Edge prev : revList[now.v]) {
+                if(value[now.v] - prev.c == value[prev.v]) {
+                    q.add(new Edge(prev.v, 0));
                     cnt++;
-                    q.add(new Edge(next.v, 0));
                 }
             }
         }
 
-        System.out.print(values[e] + "\n" + cnt);
+        System.out.print(value[b] + "\n" + cnt);
     }
 
-    static class Edge{
-        int v, w;
+    static class Edge {
+        int v, c;
 
-        Edge(int v, int w) {
+        Edge(int v, int c) {
             this.v = v;
-            this.w = w;
+            this.c = c;
         }
     }
 }
