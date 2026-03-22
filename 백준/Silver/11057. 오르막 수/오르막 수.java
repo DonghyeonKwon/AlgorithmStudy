@@ -9,24 +9,26 @@ public class Main {
 
         int n = Integer.parseInt(br.readLine());
 
-        int[][] dp = new int[n+1][10];
-        for(int i = 0; i <= 9; i++) {
-            dp[1][i] = 1;
+        int[] dp = new int[11]; // idx = 0 : sum, idx = 1, 2, ..., 10 : 9, 8, 7, ..., 0
+        Arrays.fill(dp, 1);
+        if(n == 1) {
+            System.out.print(10);
+            return;
         }
-
-        for(int i = 2; i <= n; i++) {
-            for(int j = 9; j >= 0; j--) {
-                for(int k = j; k >= 0; k--) {
-                    dp[i][j] = (dp[i][j] + dp[i-1][k]) % MOD;
+        n--;
+        while(n-->0) {
+            dp[0] = 0;
+            for(int i = 10; i > 0; i--) {
+                if(i == 10) { // 10은 0이기에 그냥 한번 더 한다.
+                    dp[0] += (dp[i] % MOD);
+                } else { //나머지들은 i+1번째 값을 추가해 개수를 늘린다.
+                    dp[i] += dp[i+1] % MOD;
+                    dp[0] += dp[i];
+                    dp[0] %= MOD;
                 }
             }
         }
 
-        int sum = 0;
-        for(int i = 0; i <= 9; i++) {
-            sum = (sum + dp[n][i]) % MOD;
-        }
-
-        System.out.print(sum);
+        System.out.print(dp[0]);
     }
 }
