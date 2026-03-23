@@ -7,35 +7,28 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int n = Integer.parseInt(br.readLine());
-        int[] arr = new int[n+1];
-
         StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int[] arr = new int[n+1];
         for(int i = 1; i <= n; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
         int m = Integer.parseInt(br.readLine());
-        for(int i = 0; i < m; i++) {
+        while(m-->0) {
             st = new StringTokenizer(br.readLine());
             int s = Integer.parseInt(st.nextToken());
-            int num = Integer.parseInt(st.nextToken());
+            int k = Integer.parseInt(st.nextToken());
 
             if(s == 1) {
-                for(int j = num; j <= n; j += num){
-                    arr[j] ^= 1;
-                }
+                for(int i = k; i <= n; i += k) arr[i] = arr[i] == 1 ? 0 : 1;
             } else {
-                int k = 1;
-                arr[num] ^= 1;
-                while(true) {
-                    if(num - k < 1 || num + k > n) break;
-                    if(arr[num - k] == arr[num + k]) {
-                        arr[num-k] ^= 1;
-                        arr[num+k] ^= 1;
-                        k++;
-                    } else {
-                        break;
-                    }
+                arr[k] = arr[k] == 1 ? 0 : 1;
+                int i = 1;
+                while(1 <= k - i && k + i <= n && arr[k+i] == arr[k-i]) {
+                    arr[k-i] = arr[k-i] == 1 ? 0 : 1;
+                    arr[k+i] = arr[k+i] == 1 ? 0 : 1;
+                    i++;
                 }
             }
         }
