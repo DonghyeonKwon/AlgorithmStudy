@@ -6,52 +6,53 @@ public class Main {
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String input = br.readLine();
-        int n = Integer.parseInt(br.readLine());
-        int[] arr = new int[27];
+        char[] arr = br.readLine().toCharArray();
+        int space = Integer.parseInt(br.readLine());
+
+        int[] cnt = new int[26];
         StringTokenizer st = new StringTokenizer(br.readLine());
         for(int i = 0; i < 26; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
+            cnt[i] = Integer.parseInt(st.nextToken());
         }
-        arr[26] = n;
 
-        char prevChar = '0';
-        char titlePrevChar = '0';
         StringBuilder sb = new StringBuilder();
-        boolean flag = true;
-        for(int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-            if(prevChar == c) continue;
+        boolean title = true;
+        boolean ans = true;
+        char prev = '-';
+        for(int i = 0; ans && i < arr.length; i++) {
+            if(Character.toLowerCase(prev) == Character.toLowerCase(arr[i])) continue;
+            prev = arr[i];
 
-            int idx = getIndex(c);
-            if(arr[idx] <= 0) {
-                flag = false;
-                break;
+            if(arr[i] == ' ') {
+                if(space > 0) {
+                    space--;
+                    title = true;
+                } else ans = false;
+
+                continue;
             }
-            arr[idx] -= 1;
 
-            if(i == 0 || input.charAt(i-1) == ' ') {
-                char cc = (char) ('A' + idx);
-                if(titlePrevChar != cc) {
-                    if(arr[idx] <= 0) {
-                        flag = false;
-                        break;
-                    }
-                    arr[idx] -= 1;
-                    titlePrevChar = cc;
+            int idx = 'A' <= arr[i] && arr[i] <= 'Z' ? arr[i] - 'A' : arr[i] - 'a';
+            if(cnt[idx] > 0) {
+                cnt[idx]--;
+            } else {
+                ans = false;
+                continue;
+            }
+
+            if(title) {
+                if(cnt[idx] > 0) {
+                    cnt[idx]--;
+                } else {
+                    ans = false;
+                    continue;
                 }
-                sb.append(cc);
+                char c = (char)('A' + idx);
+                sb.append(c);
+                title = false;
             }
-
-            prevChar = c;
         }
 
-        System.out.print(flag ? sb : -1);
-    }
-
-    static int getIndex(char c) {
-        if('A' <= c && c <= 'Z') return c - 'A';
-        if('a' <= c && c <= 'z') return c - 'a';
-        return 26;
+        System.out.print(ans ? sb : -1);
     }
 }
