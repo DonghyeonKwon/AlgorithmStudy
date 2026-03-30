@@ -36,10 +36,12 @@ public class Main {
         Queue<int[]> q = new ArrayDeque<>();
         visited[node] = true;
         visited[notGo] = true;
+
         q.add(new int[]{node, 0});
 
         int max = 0;
         int max_idx = 0;
+
         while(!q.isEmpty()) {
             int[] pos = q.poll();
 
