@@ -1,0 +1,24 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long cnt = 0;
+
+int MenOfPassion(int a[], int n){
+    int sum = 0;
+    for(int i = 1; i < n; i++)
+        for(int j = i+1; j <= n; j++)
+            cnt++;
+    cout << cnt << '\n';
+    return 2;
+}
+
+int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL); cout.tie(NULL);
+
+    int a[500001],n;
+    cin >> n;
+    
+    cout << MenOfPassion(a, n) << '\n';
+
+    return 0;
+}
