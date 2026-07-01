@@ -4,33 +4,14 @@ class Solution {
     public int solution(int x, int y, int n) {
         int answer = 0;
         
-        Queue<int[]> q = new ArrayDeque<>();
-        int[] visited = new int[y + 1];
-        Arrays.fill(visited, Integer.MAX_VALUE);
-        visited[x] = 0;
-        q.add(new int[]{x, 0});
-        
-        while(!q.isEmpty()) {
-            int[] pos = q.poll();
-            
-            if(pos[0] == y) return pos[1];
-            
-            if(pos[0] + n <= y && pos[1] + 1 < visited[pos[0] + n]) {
-                visited[pos[0] + n] = pos[1] + 1;
-                q.add(new int[]{pos[0] + n, pos[1] + 1});
-            }
-            
-            if(pos[0] * 2 <= y && pos[1] + 1 < visited[pos[0] * 2]) {
-                visited[pos[0] * 2] = pos[1] + 1;
-                q.add(new int[]{pos[0] * 2, pos[1] + 1});
-            }
-            
-            if(pos[0] * 3 <= y && pos[1] + 1 < visited[pos[0] * 3]) {
-                visited[pos[0] * 3] = pos[1] + 1;
-                q.add(new int[]{pos[0] * 3, pos[1] + 1});
-            }
+        int[] dp = new int[3000003];
+        int INF = 1000002;
+        Arrays.fill(dp, INF);
+        dp[x] = -1;
+        dp[y] = 0;
+        for(int num = Math.max(y - n, Math.max(y / 2, y / 3)); num >= x; num--){
+            dp[num] = Math.min(dp[num + n] + 1, Math.min(dp[num * 2] + 1, dp[num * 3] + 1));
         }
-        
-        return -1;
+        return dp[x] >= INF ? -1 : dp[x];
     }
 }
